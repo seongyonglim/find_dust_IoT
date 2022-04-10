@@ -24,7 +24,7 @@ class Database():
         row= self.cursor.fetchall()
         return row
  
-    def commit():
+    def commit(self):
         self.db.commit()
 
 db = Database()
@@ -40,9 +40,9 @@ def id_get():  #사용자 아이디를 GET으로 받음
     row = db.executeAll('SELECT id FROM data_db.User WHERE id = ' + id)
     if(row == ()):
         db.execute('INSERT INTO data_db.User(ID, Coin) VALUES('+id+',0);')
-        #db.commit()
-    
-    return {"result": "success"} 
+        db.commit()
+    coin = db.executeAll('SELECT coin FROM data_db.User WHERE id = ' + id)
+    return {"result": "success", "coin": coin[0]['coin']} 
 
 @app.route('/map')
 def map():
