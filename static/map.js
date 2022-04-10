@@ -1,5 +1,8 @@
 var marker = [];
 
+var X_RESOLUTION = 10;
+var Y_RESOLUTION = 10;
+
 show = function() {             
     marker.forEach(element => {
         element.setMap(null);
