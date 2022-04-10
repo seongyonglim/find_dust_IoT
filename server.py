@@ -2,6 +2,8 @@ from flask import Flask, render_template, request
 
 import pymysql
 
+import json
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -41,9 +43,12 @@ def dust():
                                   charset='utf8')
     cursor = db.cursor()
     bounds = request.args.get('bounds')
-    sw = bounds[0]
-    ne = bounds[1]
-    return {1:1}
+    bounds = json.loads(bounds)
+
+    cursor.execute('SELECT x, y, Pullution FROM data_db.DustData WHERE x > '+ str(bounds['ha']) +'AND x < '+ str(bounds['oa']) + 'AND y > ' + str(bounds['qa']) + 'AND y < ' + str(bounds['pa']))
+    row = cursor.fetchall()
+    db.close()
+    return {'data':row}
 
 @app.route('/shop', methods=['GET'])
 def shop():
