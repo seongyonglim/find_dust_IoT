@@ -1,0 +1,32 @@
+.tabs__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.tabs__li {
+  float: left;
+  width: 20%;
+}
+
+.tabs__profile {
+  float: right;
+}
+
+.btn__profile {
+  float: right;
+}
+
+.tabs__space {
+  width: 100%;
+}
+
+.tabs__iframe {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+}
