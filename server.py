@@ -44,11 +44,26 @@ def dust():
     cursor = db.cursor()
     bounds = request.args.get('bounds')
     bounds = json.loads(bounds)
-
-    cursor.execute('SELECT x, y, Pullution FROM data_db.DustData WHERE x > '+ str(bounds['ha']) +'AND x < '+ str(bounds['oa']) + 'AND y > ' + str(bounds['qa']) + 'AND y < ' + str(bounds['pa']))
-    row = cursor.fetchall()
+    x_res = bounds[1]
+    y_res = bounds[2]
+    bounds = bounds[0]
+    dx = (bounds['oa'] - bounds['ha']) / 2 / x_res
+    dy = (bounds['pa'] - bounds['qa']) / 2 / y_res
+    data = []
+    for i in range(x_res):
+        _data = []
+        for j in range(y_res):
+            x_min = bounds['ha'] + (i * 2 * dx)
+            x_max = bounds['ha'] + ((i + 1) * 2 * dx)
+            y_min = bounds['qa'] + (j * 2 * dy)
+            y_max = bounds['qa'] + ((j + 1) * 2 * dy)
+            cursor.execute('SELECT AVG(Pullution) FROM data_db.DustData WHERE x > '+ str(x_min) +'AND x < '+ str(x_max) + 'AND y > ' + str(y_min) + 'AND y < ' + str(y_max))
+            row = cursor.fetchall()
+            _data.append([row[0][0], bounds['ha'] + ((i * 2 + 1) * dx), bounds['qa'] + ((j * 2 + 1) * dy)])
+        data.append(_data)
+    
     db.close()
-    return {'data':row}
+    return {'data':data}
 
 @app.route('/shop', methods=['GET'])
 def shop():
