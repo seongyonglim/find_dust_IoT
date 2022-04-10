@@ -2,32 +2,6 @@ from flask import Flask, render_template, request
 
 import pymysql
 
-class Database():
-    def __init__(self):
-        self.db = pymysql.connect(host='localhost',
-                                  user='root',
-                                  password='12345',
-                                  db='data_db',
-                                  charset='utf8')
-        self.cursor= self.db.cursor(pymysql.cursors.DictCursor)
-        
-    def execute(self, query, args={}):
-        self.cursor.execute(query, args) 
- 
-    def executeOne(self, query, args={}):
-        self.cursor.execute(query, args)
-        row= self.cursor.fetchone()
-        return row
- 
-    def executeAll(self, query, args={}):
-        self.cursor.execute(query, args)
-        row= self.cursor.fetchall()
-        return row
- 
-    def commit(self):
-        self.db.commit()
-
-db = Database()
 app = Flask(__name__)
 
 @app.route('/')
@@ -36,20 +10,56 @@ def indexes():
 
 @app.route('/login', methods=['GET'])
 def id_get():  #사용자 아이디를 GET으로 받음
+    db = pymysql.connect(host='localhost',
+                                  user='root',
+                                  password='12345',
+                                  db='data_db',
+                                  charset='utf8')
+    cursor = db.cursor()
     id = request.args.get('id') 
-    row = db.executeAll('SELECT id FROM data_db.User WHERE id = ' + id)
+    cursor.execute('SELECT id FROM data_db.User WHERE id = %s' % id)
+    row = cursor.fetchall()
     if(row == ()):
-        db.execute('INSERT INTO data_db.User(ID, Coin) VALUES('+id+',0);')
+        cursor.execute( 'INSERT INTO data_db.User(ID, Coin) VALUES(%s, 0);' % id )
         db.commit()
-    coin = db.executeAll('SELECT coin FROM data_db.User WHERE id = ' + id)
-    return {"result": "success", "coin": coin[0]['coin']} 
+    cursor.execute('SELECT Coin FROM User WHERE id = %s' % id)
+    coin = cursor.fetchall()
+    print(coin)
+    db.close()
+    return {"result": "success", "coin": coin[0][0]} 
 
 @app.route('/map')
 def map():
     return render_template('map.html')
 
-@app.route('/shop')
+@app.route('/dust_data', methods=['GET'])
+def dust():
+    db = pymysql.connect(host='localhost',
+                                  user='root',
+                                  password='12345',
+                                  db='data_db',
+                                  charset='utf8')
+    cursor = db.cursor()
+    bounds = request.args.get('bounds')
+    sw = bounds[0]
+    ne = bounds[1]
+    return {1:1}
+
+@app.route('/shop', methods=['GET'])
 def shop():
+    db = pymysql.connect(host='localhost',
+                                  user='root',
+                                  password='12345',
+                                  db='data_db',
+                                  charset='utf8')
+    cursor = db.cursor()
+    id = request.args.get('id')
+    if id is not None:
+        cursor.execute('SELECT id FROM data_db.User WHERE id = ' + id)
+        row = cursor.fetchall()
+        if row != ():    
+            return render_template('shop.html')
+    db.close()
     return render_template('shop_login.html')
 
 if __name__ == '__main__':

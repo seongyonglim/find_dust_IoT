@@ -33,9 +33,10 @@ function kakaoLogin() {
                     $.get(
                         "/login?id="+user_id.id,
                         function(response) {
-                            console.log (response);
+                            //console.log (response);
                         }
                      )
+                     $('#shop_iframe').attr('src', '/shop?id='+user_id.id);
                 },
                 fail: function (error) {
                     console.log(error)
@@ -58,7 +59,7 @@ function kakaoLogout() {
                 login_txt = is_login?"로그아웃":"로그인";
             
                 login_btns.forEach(element => element[0].textContent = login_txt);
-                $
+                $('#shop_iframe').attr('src', '/shop');
             },
             fail: function (error) {
                 console.log(error)
